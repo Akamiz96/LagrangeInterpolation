@@ -15,6 +15,8 @@
 float L(int i, float t, std::deque<float> x);
 float Lagrange(float t, std::deque<float> x, std::deque<float> y);
 
+float maximo( int dia, std::deque<float> answerY );
+float minimo( int dia, std::deque<float> answerY );
 int main (int argc, char* argv[])
 {
     //Estructuras para guardar los puntos dados en X y Y
@@ -84,9 +86,18 @@ int main (int argc, char* argv[])
     for(; itX != answerX.end() && itY != answerY.end(); itX++, itY++){
         outputFile << *itX << "," << *itY << std::endl;
     }
+    std::ofstream ultimateFile("ultimateFile.txt");
+    for(std::deque<float>::iterator it = x.begin(); it != x.end(); it ++){
+      ultimateFile << *it << ",";
+      ultimateFile << minimo(*it,answerY) << ",";
+      ultimateFile << maximo(*it,answerY) << ",";
+      ultimateFile << answerY[(((*it)-1)*24)+8] << ",";
+      ultimateFile << answerY[(((*it)-1)*24)+17] << std::endl;
+    }
     //Cierre de los archivos utilizados
     file.close();
     outputFile.close();
+    ultimateFile.close();
     return 0;
 }
 /*
@@ -122,18 +133,39 @@ float Lagrange(float t, std::deque<float> x, std::deque<float> y)
     }
     return result;
 }
+/*
 
-float maximo( int dia, std::deque<float> answerX, std::deque<float> answerY )
+ */
+float maximo( int dia, std::deque<float> answerY )
 {
   int finDia = dia * 24;
-  int inicioDia = dia - 24;
-  float maximo = answerY[ inicioDia ];
+  int inicioDia = finDia - 24;
+  float maximo = answerY[inicioDia];
   inicioDia++;
-  for( inicioDia; inicioDia < finDia; inicioDia++ )
+  for( ; inicioDia < finDia; inicioDia++ )
   {
-    if( maximo < answerY[ inicioDia ] )
+    if( maximo < answerY[inicioDia] )
     {
-      maximo = answerY;
+      maximo = answerY[inicioDia];
     }
   }
+  return maximo;
+}
+/*
+
+ */
+float minimo( int dia, std::deque<float> answerY )
+{
+  int finDia = dia * 24;
+  int inicioDia = finDia - 24;
+  float minimo = answerY[inicioDia];
+  inicioDia++;
+  for( ; inicioDia < finDia; inicioDia++ )
+  {
+    if( minimo > answerY[inicioDia] )
+    {
+      minimo = answerY[inicioDia];
+    }
+  }
+  return minimo;
 }
